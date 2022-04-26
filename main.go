@@ -50,7 +50,21 @@ func process(c *gin.Context) {
 		res = append(res, each)
 	}
 
-	c.JSON(http.StatusOK, res)
+	// --- order desc
+	orderDesc := gubrak.From(res).OrderBy(func(each Result) int {
+		return each.Count
+	}, false).Result()
+
+	// --- top 10 result
+	top10Results := []Result{}
+	for i, v := range orderDesc.([]Result) {
+		if i > 9 {
+			break
+		}
+		top10Results = append(top10Results, v)
+	}
+
+	c.JSON(http.StatusOK, top10Results)
 }
 
 func isPunctuation(c string) bool {
